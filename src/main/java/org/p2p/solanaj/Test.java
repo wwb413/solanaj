@@ -7,24 +7,36 @@ import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ConfirmedTransaction;
 
+import java.security.MessageDigest;
+import java.util.Base64;
+
 public class Test {
 
     public static void main(String[] args) throws Exception {
 
-        RpcClient client = new RpcClient(Cluster.MAINNET);
+        String input = "QMqFu4fYGGeUEysFnenhAvDWgqp1W7DbrMv3z8JcyrP4Bu3Yyyj7irLW76wEzMiFqkMXcsUXJG1WLwjdCWzNTL6957kdfWSD7SPFG2av5YHKd4yTDSavYUfe2agybsjSwMvyoL2Nw47Gn9sEUxgM3DqyjrmuKozHUZb2UHhyXXPCjyH";
 
-        RpcApi api = client.getApi();
+        try {
+            // Step 1: Base64 decode
+            byte[] decodedBytes = Base64.getDecoder().decode(input);
 
-        ConfirmedTransaction transaction = api.getTransaction("5Na9UJjPTaawz59C3MxHtiiexqgf1Lr12btzpwZ1wTxLHoBkMiJWRS3iyPVeyJRUEWS7vBA6pLANVhGxYrEf6s9d");
+            // Step 2: Compute SHA-256 hash
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(decodedBytes);
 
-        ConfirmedTransaction.Message message = transaction.getTransaction().getMessage();
-        System.out.println(message.getInstructions());
+            // Convert hash to hex string
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
 
-        System.out.println(message.getAccountKeys());
-
-
-
-        System.out.println( new JSONArray(transaction.getMeta().getInnerInstructions()));
+            // Output the result
+            System.out.println("Hash: " + hexString.toString());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Base64 decoding failed: " + e.getMessage());
+        }
 
     }
 }

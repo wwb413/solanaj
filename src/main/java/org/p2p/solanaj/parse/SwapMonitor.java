@@ -2,6 +2,10 @@ package org.p2p.solanaj.parse;
 
 import org.p2p.solanaj.parse.bean.Consts;
 import org.p2p.solanaj.parse.bean.SwapData;
+import org.p2p.solanaj.rpc.Cluster;
+import org.p2p.solanaj.rpc.RpcApi;
+import org.p2p.solanaj.rpc.RpcClient;
+import org.p2p.solanaj.rpc.RpcException;
 import org.p2p.solanaj.rpc.types.ConfirmedTransaction;
 
 import java.util.ArrayList;
@@ -9,8 +13,15 @@ import java.util.List;
 
 public class SwapMonitor {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        RpcClient client = new RpcClient(Cluster.MAINNET);
 
+        RpcApi api = client.getApi();
+
+        ConfirmedTransaction transaction = api.getTransaction("DBctXdTTtvn7Rr4ikeJFCBz4AtHmJRyjHGQFpE59LuY3Shb7UcRJThAXC7TGRXXskXuu9LEm9RqtU6mWxe5cjPF");
+
+
+        processSwapTx(transaction);
 
     }
 
@@ -24,7 +35,7 @@ public class SwapMonitor {
         List<ConfirmedTransaction.Instruction> instructions = tx.getTransaction().getMessage().getInstructions();
         List<String> accountKeys = tx.getTransaction().getMessage().getAccountKeys();
         for (int i = 0; i < instructions.size(); i++) {
-            String proId = accountKeys.get(i);
+            String proId = accountKeys.get((int)instructions.get(i).getProgramIdIndex());
             if (proId.equals(Consts.JUPITER_PROGRAM_ID)){
                 skip = true;
                 swapData.add(JupiterSwapParse.parseSwap(tx,i));
