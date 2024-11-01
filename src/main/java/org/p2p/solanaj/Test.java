@@ -1,5 +1,6 @@
 package org.p2p.solanaj;
 
+import cn.hutool.json.JSONArray;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcApi;
 import org.p2p.solanaj.rpc.RpcClient;
@@ -21,7 +22,9 @@ public class Test {
 
         System.out.println(message.getAccountKeys());
 
-        System.out.println(transaction.getMeta().getInnerInstructions());
+
+
+        System.out.println( new JSONArray(transaction.getMeta().getInnerInstructions()));
 
     }
 }
